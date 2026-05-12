@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed, shallowRef, markRaw } from 'vue';
+import { ref, computed, shallowRef, markRaw, watch } from 'vue';
 import type { CapturedRequest, FilterOptions } from '@shared/types';
 
 export const useTrafficStore = defineStore('traffic', () => {
@@ -48,12 +48,23 @@ export const useTrafficStore = defineStore('traffic', () => {
     return Array.from(types).sort();
   });
 
+  const debouncedSearchQuery = ref('');
+  let debounceTimeout: any = null;
+
+  watch(() => filter.value.searchQuery, (newVal) => {
+    if (debounceTimeout) clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      debouncedSearchQuery.value = newVal;
+    }, 300);
+  });
+
   const filteredRequests = computed(() => {
     const allRequests = requests.value;
     if (allRequests.length === 0) return [];
 
     let result = [...allRequests];
-    const { searchQuery, useRegex, searchInBody, searchInHeaders, methods, statusCodes, minSize, maxSize, minDuration, maxDuration, hosts, contentTypes, dateRange } = filter.value;
+    const { useRegex, searchInBody, searchInHeaders, methods, statusCodes, minSize, maxSize, minDuration, maxDuration, hosts, contentTypes, dateRange } = filter.value;
+    const searchQuery = debouncedSearchQuery.value;
     
     // Search query
     if (searchQuery) {
@@ -167,33 +178,49 @@ export const useTrafficStore = defineStore('traffic', () => {
     }
   }
 
-  function addRequest(request: CapturedRequest | CapturedRequest[]) {
-    const newRequests = Array.isArray(request) ? request.map(r => markRaw(r)) : [markRaw(request)];
+  // Actions
+  let pendingRequests: CapturedRequest[] = [];
+  let updateTimeout: any = null;
+
+  function processPendingRequests() {
+    if (pendingRequests.length === 0) return;
     
-    // Update shallow array by creating a new reference
+    const newRequests = pendingRequests.map(r => markRaw(r));
+    pendingRequests = [];
+    
     const updated = [...newRequests, ...requests.value];
     
     // Limit array size for performance
     if (updated.length > 5000) {
       requests.value = updated.slice(0, 5000);
-      // Clean cache for old requests
       if (searchableCache.size > 6000) searchableCache.clear();
     } else {
       requests.value = updated;
     }
     
     totalCount.value += newRequests.length;
+    updateTimeout = null;
+  }
+
+  function addRequest(request: CapturedRequest | CapturedRequest[]) {
+    const items = Array.isArray(request) ? request : [request];
+    pendingRequests.push(...items);
+    
+    if (!updateTimeout) {
+      // Throttle updates to ~4fps for smooth UI even under heavy load
+      updateTimeout = setTimeout(processPendingRequests, 250);
+    }
   }
 
   function updateRequest(request: CapturedRequest) {
     const rawRequest = markRaw(request);
     const index = requests.value.findIndex(r => r.id === rawRequest.id);
     if (index !== -1) {
+      // Direct update for status changes (e.g. pending to completed)
       const updated = [...requests.value];
       updated[index] = rawRequest;
       requests.value = updated;
       
-      // Update selected if it's the same
       if (selectedRequest.value?.id === rawRequest.id) {
         selectedRequest.value = rawRequest;
       }

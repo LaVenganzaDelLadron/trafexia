@@ -101,6 +101,12 @@ const api: IpcApi = {
   launchAndroidAvd: (name: string): Promise<boolean> => {
     return ipcRenderer.invoke(IPC_CHANNELS.ANDROID_LAUNCH_AVD, name);
   },
+  getIosDevices: (): Promise<IosDevice[]> => {
+    return ipcRenderer.invoke(IPC_CHANNELS.IOS_GET_DEVICES);
+  },
+  launchIosDevice: (udid: string): Promise<boolean> => {
+    return ipcRenderer.invoke(IPC_CHANNELS.IOS_LAUNCH_DEVICE, udid);
+  },
 
   // Request Replay & Composer
   replayRequest: (id: number): Promise<CapturedRequest> => {

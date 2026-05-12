@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { Play, Square, Loader2, Smartphone, Globe, ShieldCheck } from 'lucide-vue-next';
 import { useProxyStore } from '@/stores/proxyStore';
 import AndroidBridgeDialog from './AndroidBridgeDialog.vue';
+import IosBridgeDialog from './IosBridgeDialog.vue';
 
 const proxyStore = useProxyStore();
 
@@ -28,23 +29,10 @@ async function toggleProxy() {
   }
 }
 
-async function launchEmulator() {
-  try {
-    await window.electronAPI.launchEmulator();
-  } catch (error) {
-    console.error('Failed to launch emulator:', error);
-  }
-}
-
 const showAndroidBridge = ref(false);
+const showIosBridge = ref(false);
 
-async function launchSimulator() {
-  try {
-    await window.electronAPI.launchSimulator();
-  } catch (error) {
-    console.error('Failed to launch simulator:', error);
-  }
-}
+const isMac = computed(() => window.navigator.platform.toUpperCase().indexOf('MAC') >= 0);
 </script>
 
 <template>
@@ -78,8 +66,9 @@ async function launchSimulator() {
 
       <!-- iOS Simulator Bridge -->
       <button 
+        v-if="isMac"
         class="eg-btn-bridge" 
-        @click="launchSimulator" 
+        @click="showIosBridge = true" 
         :disabled="!proxyStore.isRunning"
         title="Bridge to iOS Simulator"
       >
@@ -101,6 +90,9 @@ async function launchSimulator() {
 
     <!-- Android Bridge Dialog -->
     <AndroidBridgeDialog v-if="showAndroidBridge" @close="showAndroidBridge = false" />
+    
+    <!-- iOS Bridge Dialog -->
+    <IosBridgeDialog v-if="showIosBridge" @close="showIosBridge = false" />
   </div>
 </template>
 

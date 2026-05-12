@@ -11,6 +11,7 @@ import type { LicenseService } from './services/LicenseService';
 import type { MapService } from './services/MapService';
 import type { ThrottleService } from './services/ThrottleService';
 import type { AndroidService } from './services/AndroidService';
+import type { IosService } from './services/IosService';
 import type {
   ProxyConfig,
   ProxyStatus,
@@ -44,11 +45,12 @@ interface Services {
   mapService: MapService;
   throttleService: ThrottleService;
   androidService: AndroidService;
+  iosService: IosService;
   mainWindow: () => BrowserWindow | null;
 }
 
 export function setupIpcHandlers(services: Services): void {
-  const { certificateManager, proxyServer, trafficStorage, certServer, breakpointService, mockService, requestComposer, licenseService, mapService, throttleService, androidService, mainWindow } = services;
+  const { certificateManager, proxyServer, trafficStorage, certServer, breakpointService, mockService, requestComposer, licenseService, mapService, throttleService, androidService, iosService, mainWindow } = services;
 
   /**
    * Server-side feature gate enforcement.
@@ -458,6 +460,24 @@ export function setupIpcHandlers(services: Services): void {
       return await androidService.launchAvd(name);
     } catch (error) {
       console.error('[IPC] Failed to launch Android AVD:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.IOS_GET_DEVICES, async (): Promise<IosDevice[]> => {
+    try {
+      return await iosService.listDevices();
+    } catch (error) {
+      console.error('[IPC] Failed to get iOS devices:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.IOS_LAUNCH_DEVICE, async (_event, udid: string): Promise<boolean> => {
+    try {
+      return await iosService.launchDevice(udid);
+    } catch (error) {
+      console.error('[IPC] Failed to launch iOS device:', error);
       throw error;
     }
   });

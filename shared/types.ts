@@ -256,6 +256,8 @@ export const IPC_CHANNELS = {
   ANDROID_BRIDGE_DEVICE: "android:bridge-device",
   ANDROID_GET_AVDS: "android:get-avds",
   ANDROID_LAUNCH_AVD: "android:launch-avd",
+  IOS_GET_DEVICES: "ios:get-devices",
+  IOS_LAUNCH_DEVICE: "ios:launch-device",
 
   // Request Replay & Composer
   REQUEST_REPLAY: "request:replay",
@@ -419,6 +421,15 @@ export interface AndroidDevice {
   status: string;
 }
 
+// ===== iOS Device =====
+export interface IosDevice {
+  udid: string;
+  name: string;
+  state: string;
+  isAvailable: boolean;
+  runtime: string;
+}
+
 // ===== Session =====
 export interface SavedSession {
   id: string;
@@ -463,6 +474,8 @@ export interface IpcApi {
   bridgeAndroidDevice: (deviceId: string) => Promise<boolean>;
   getAndroidAvds: () => Promise<string[]>;
   launchAndroidAvd: (name: string) => Promise<boolean>;
+  getIosDevices: () => Promise<IosDevice[]>;
+  launchIosDevice: (udid: string) => Promise<boolean>;
 
   // Request Replay & Composer
   replayRequest: (id: number) => Promise<CapturedRequest>;

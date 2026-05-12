@@ -11,6 +11,7 @@ import { LicenseService } from './services/LicenseService';
 import { MapService } from './services/MapService';
 import { ThrottleService } from './services/ThrottleService';
 import { AndroidService } from './services/AndroidService';
+import { IosService } from './services/IosService';
 import { setupIpcHandlers } from './ipc-handlers';
 import { setupSslBypassIpc, cleanupFridaProcess } from '../ssl-bypass/ssl-bypass-ipc';
 import { getLocalIp } from './utils/network';
@@ -27,6 +28,7 @@ let licenseService: LicenseService;
 let mapService: MapService;
 let throttleService: ThrottleService;
 let androidService: AndroidService;
+let iosService: IosService;
 let mainWindow: BrowserWindow | null = null;
 
 // Disable hardware acceleration for better compatibility
@@ -115,6 +117,7 @@ const initializeServices = async () => {
   mapService = new MapService(trafficStorage);
   throttleService = new ThrottleService(trafficStorage);
   androidService = new AndroidService();
+  iosService = new IosService();
 
   // Load rules and initialize
   await mockService.loadRules();
@@ -138,6 +141,7 @@ const initializeServices = async () => {
     mapService,
     throttleService,
     androidService,
+    iosService,
     mainWindow: () => mainWindow,
   });
 
