@@ -289,6 +289,14 @@ export const IPC_CHANNELS = {
   SSL_BYPASS_FRIDA_LOG: "ssl-bypass:frida-log",
   SSL_BYPASS_HOST_DETECTED: "ssl-bypass:host-detected",
 
+  // Frida Integration
+  FRIDA_GET_DEVICES: "frida:get-devices",
+  FRIDA_GET_APPS: "frida:get-apps",
+  FRIDA_START: "frida:start",
+  FRIDA_STOP: "frida:stop",
+  FRIDA_CHECK_DEPS: "frida:check-deps",
+  FRIDA_SETUP_SERVER: "frida:setup-server",
+
   // Map Rules (Pro)
   MAP_GET_RULES: "map:get-rules",
   MAP_ADD_RULE: "map:add-rule",
@@ -424,6 +432,15 @@ export interface AndroidDevice {
   status: string;
 }
 
+// ===== Android App =====
+export interface AndroidApp {
+  packageName: string;
+  label: string;
+  icon?: string;
+  version?: string;
+  isSystem: boolean;
+}
+
 // ===== iOS Device =====
 export interface IosDevice {
   udid: string;
@@ -513,6 +530,14 @@ export interface IpcApi {
   ) => Promise<void>;
   stopFrida: () => Promise<void>;
   getDetectedHosts: () => Promise<DetectedPinningHost[]>;
+
+  // Frida Integration
+  fridaGetDevices: () => Promise<AndroidDevice[]>;
+  fridaGetApps: (deviceId: string) => Promise<AndroidApp[]>;
+  fridaStart: (deviceId: string, packageName: string) => Promise<void>;
+  fridaStop: () => Promise<void>;
+  fridaCheckDeps: () => Promise<{ adb: boolean; frida: boolean; fridaTools: boolean }>;
+  fridaSetupServer: (deviceId: string) => Promise<boolean>;
 
   // Map Rules (Pro)
   getMapRules: () => Promise<MapRule[]>;

@@ -16,8 +16,8 @@ import {
   Lock,
   Gauge,
   GitCompare,
-  Crown,
   Map,
+  Cpu,
 } from "lucide-vue-next";
 import { useToast } from "primevue/usetoast";
 
@@ -42,6 +42,7 @@ import LicenseDialog from "@/components/LicenseDialog.vue";
 import ThrottleControl from "@/components/ThrottleControl.vue";
 import DiffViewer from "@/components/DiffViewer.vue";
 import MapRulesManager from "@/components/MapRulesManager.vue";
+import FridaPanel from "@/components/FridaPanel.vue";
 
 const trafficStore = useTrafficStore();
 const proxyStore = useProxyStore();
@@ -59,6 +60,7 @@ const showSslBypass = ref(false);
 const showThrottle = ref(false);
 const showDiff = ref(false);
 const showMapRules = ref(false);
+const showFrida = ref(false);
 const viewMode = ref<"list" | "timeline">("list");
 
 // Computed
@@ -217,6 +219,11 @@ function exportPostman() {
             :title="'SSL Bypass' + (!licenseStore.hasFeature('ssl-bypass') ? ' — PRO' : '')"
             :class="{ locked: !licenseStore.hasFeature('ssl-bypass') }">
             <Lock :size="14" />
+          </button>
+          <button class="icon-btn"
+            @click="showFrida = true"
+            title="Frida Integration">
+            <Cpu :size="14" />
           </button>
           <button class="icon-btn"
             @click="licenseStore.guardFeature('throttle') && (showThrottle = !showThrottle)"
@@ -378,6 +385,22 @@ function exportPostman() {
 
     <!-- SSL Bypass View -->
     <SslBypassView v-if="showSslBypass" @close="showSslBypass = false" />
+
+    <!-- Frida Panel -->
+    <div v-if="showFrida" class="frida-overlay">
+      <div class="frida-window">
+        <div class="frida-header">
+          <div class="brand">
+            <Cpu :size="16" class="text-accent" />
+            <span>FRIDA INTERCEPTION ENGINE</span>
+          </div>
+          <button class="close-btn" @click="showFrida = false"><X :size="18" /></button>
+        </div>
+        <div class="frida-body">
+          <FridaPanel />
+        </div>
+      </div>
+    </div>
 
     <!-- Breakpoint Editor -->
     <BreakpointEditor />
@@ -798,7 +821,72 @@ function exportPostman() {
 }
 
 .resize-handle:hover {
-  background: #58a6ff !important;
+  background: var(--color-accent) !important;
+}
+
+/* Frida Overlay */
+.frida-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  padding: 40px;
+}
+
+.frida-window {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  max-height: 800px;
+  background: #0B1120;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.frida-header {
+  height: 52px;
+  padding: 0 20px;
+  background: #0F172A;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.frida-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #F1F5F9;
+}
+
+.frida-header .close-btn {
+  background: transparent;
+  border: none;
+  color: #64748B;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.frida-header .close-btn:hover {
+  color: #F85149;
+  background: rgba(248, 81, 73, 0.1);
+}
+
+.frida-body {
+  flex: 1;
+  overflow: hidden;
 }
 
 .view-toggle {

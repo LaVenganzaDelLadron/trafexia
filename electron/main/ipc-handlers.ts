@@ -12,6 +12,7 @@ import type { MapService } from './services/MapService';
 import type { ThrottleService } from './services/ThrottleService';
 import type { AndroidService } from './services/AndroidService';
 import type { IosService } from './services/IosService';
+import type { FridaManager } from './services/FridaManager';
 import type {
   ProxyConfig,
   ProxyStatus,
@@ -48,11 +49,12 @@ interface Services {
   throttleService: ThrottleService;
   androidService: AndroidService;
   iosService: IosService;
+  fridaManager: FridaManager;
   mainWindow: () => BrowserWindow | null;
 }
 
 export function setupIpcHandlers(services: Services): void {
-  const { certificateManager, proxyServer, trafficStorage, certServer, breakpointService, mockService, requestComposer, licenseService, mapService, throttleService, androidService, iosService, mainWindow } = services;
+  const { certificateManager, proxyServer, trafficStorage, certServer, breakpointService, mockService, requestComposer, licenseService, mapService, throttleService, androidService, iosService, fridaManager, mainWindow } = services;
 
   /**
    * Server-side feature gate enforcement.
@@ -725,6 +727,44 @@ export function setupIpcHandlers(services: Services): void {
 
   ipcMain.handle(IPC_CHANNELS.LICENSE_GET_FEATURE_GATES, async (): Promise<Record<string, LicenseTier>> => {
     return licenseService.getFeatureGates();
+  });
+
+  // ===== Frida Integration =====
+
+  fridaManager.setLogCallback((log) => {
+    const win = mainWindow();
+    if (win && !win.isDestroyed()) {
+      win.webContents.send(IPC_CHANNELS.SSL_BYPASS_FRIDA_LOG, log);
+    }
+  });
+
+  ipcMain.handle(IPC_CHANNELS.FRIDA_GET_DEVICES, async () => {
+    return fridaManager.getDevices();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.FRIDA_GET_APPS, async (_event, deviceId: string) => {
+    return fridaManager.getApps(deviceId);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.FRIDA_START, async (_event, deviceId: string, packageName: string) => {
+    const settings = loadSettings(trafficStorage);
+    const localIp = getLocalIp();
+    const certPath = certificateManager.getCertPath();
+    const caCert = fs.readFileSync(certPath, 'utf-8');
+    
+    return fridaManager.startFrida(deviceId, packageName, localIp, settings.proxyPort, caCert);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.FRIDA_STOP, async () => {
+    return fridaManager.stopFrida();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.FRIDA_CHECK_DEPS, async () => {
+    return fridaManager.checkDependencies();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.FRIDA_SETUP_SERVER, async (_event, deviceId: string) => {
+    return fridaManager.setupFridaServer(deviceId);
   });
 }
 

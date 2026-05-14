@@ -13,6 +13,7 @@ import { ThrottleService } from './services/ThrottleService';
 import { AndroidService } from './services/AndroidService';
 import { IosService } from './services/IosService';
 import { ApkSignerService } from './services/ApkSignerService';
+import { FridaManager } from './services/FridaManager';
 import { setupIpcHandlers } from './ipc-handlers';
 import { setupSslBypassIpc, cleanupFridaProcess } from '../ssl-bypass/ssl-bypass-ipc';
 import { getLocalIp } from './utils/network';
@@ -31,6 +32,7 @@ let throttleService: ThrottleService;
 let androidService: AndroidService;
 let iosService: IosService;
 let apkSignerService: ApkSignerService;
+let fridaManager: FridaManager;
 let mainWindow: BrowserWindow | null = null;
 
 // Disable hardware acceleration for better compatibility
@@ -121,6 +123,7 @@ const initializeServices = async () => {
   androidService = new AndroidService();
   iosService = new IosService();
   apkSignerService = new ApkSignerService();
+  fridaManager = new FridaManager();
 
   // Load rules and initialize
   await mockService.loadRules();
@@ -146,6 +149,7 @@ const initializeServices = async () => {
     androidService,
     iosService,
     apkSignerService,
+    fridaManager,
     mainWindow: () => mainWindow,
   });
 
