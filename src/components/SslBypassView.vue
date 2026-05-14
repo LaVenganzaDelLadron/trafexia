@@ -49,10 +49,10 @@ const archOptions = [
 ];
 
 const filteredTraffic = computed(() => {
-  // If we have a selected device, try to filter traffic by its IP
+  // Return recent traffic requests
   const device = devices.value.find(d => d.id === selectedDeviceId.value);
-  if (device && device.ip) {
-    return (trafficStore.requests || []).filter(t => t.clientIp === device.ip).slice(-50).reverse();
+  if (device) {
+    return (trafficStore.requests || []).slice(-50).reverse();
   }
   return (trafficStore.requests || []).slice(-20).reverse();
 });
@@ -356,7 +356,7 @@ async function toggleFrida() {
                     <span class="method" :class="t.method">{{ t.method }}</span>
                     <span class="host">{{ t.host }}</span>
                     <span class="path">{{ t.path }}</span>
-                    <span class="status" :class="{ error: t.statusCode >= 400 }">{{ t.statusCode || '---' }}</span>
+                    <span class="status" :class="{ error: t.status >= 400 }">{{ t.status || '---' }}</span>
                   </div>
                 </div>
               </div>

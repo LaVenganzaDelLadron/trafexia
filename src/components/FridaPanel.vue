@@ -19,7 +19,6 @@ import {
   Package
 } from "lucide-vue-next";
 import { useFridaStore } from "@/stores/fridaStore";
-import type { AndroidApp, AndroidDevice } from "@shared/types";
 
 const store = useFridaStore();
 const searchQuery = ref("");

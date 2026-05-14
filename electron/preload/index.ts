@@ -18,7 +18,6 @@ import type {
   SavedSession,
   PatchResult,
   FridaArch,
-  BypassFramework,
   FridaLogEntry,
   DetectedPinningHost,
   AndroidDevice,
@@ -158,7 +157,7 @@ const api: IpcApi = {
   patchApk: (inputPath: string, outputPath: string): Promise<PatchResult> => {
     return ipcRenderer.invoke(IPC_CHANNELS.SSL_BYPASS_PATCH_APK, inputPath, outputPath);
   },
-  injectGadget: (apkPath: string, arch: FridaArch, outputPath: string): Promise<void> => {
+  injectGadget: (apkPath: string, arch: FridaArch, outputPath: string): Promise<string[]> => {
     return ipcRenderer.invoke(IPC_CHANNELS.SSL_BYPASS_INJECT_GADGET, apkPath, arch, outputPath);
   },
   startFrida: (packageName, framework, deviceId) =>

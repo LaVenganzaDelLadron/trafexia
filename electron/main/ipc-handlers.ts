@@ -12,6 +12,7 @@ import type { MapService } from './services/MapService';
 import type { ThrottleService } from './services/ThrottleService';
 import type { AndroidService } from './services/AndroidService';
 import type { IosService } from './services/IosService';
+import type { ApkSignerService } from './services/ApkSignerService';
 import type { FridaManager } from './services/FridaManager';
 import type {
   ProxyConfig,
@@ -49,6 +50,7 @@ interface Services {
   throttleService: ThrottleService;
   androidService: AndroidService;
   iosService: IosService;
+  apkSignerService: ApkSignerService;
   fridaManager: FridaManager;
   mainWindow: () => BrowserWindow | null;
 }

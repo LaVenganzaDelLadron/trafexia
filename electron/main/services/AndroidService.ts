@@ -205,6 +205,7 @@ export class AndroidService {
       return true;
     } catch (error) {
       console.error(`[AndroidService] Failed to clear proxy on device ${deviceId}:`, error);
+      return false;
     }
   }
 
