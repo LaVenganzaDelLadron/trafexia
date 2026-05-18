@@ -27,11 +27,11 @@ jobs:
         include:
           - os: macos-latest
             platform: mac
-            build_cmd: yarn build:mac
+            build_cmd: npm run build:mac
 
           - os: windows-latest
             platform: win
-            build_cmd: yarn build:win
+            build_cmd: npm run build:win
 
           # Uncomment if needed
           # - os: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
+          cache: npm
 
       - name: Restore Electron cache
         uses: actions/cache@v4
@@ -60,7 +60,7 @@ jobs:
           path: |
             .cache/electron
             .cache/electron-builder
-          key: ${{ runner.os }}-electron-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-electron-${{ hashFiles('package-lock.json') }}
 
       - name: Install Linux dependencies
         if: matrix.os == 'ubuntu-latest'
@@ -76,14 +76,14 @@ jobs:
             libgbm1
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Rebuild native modules
         run: npx electron-builder install-app-deps
         continue-on-error: true
 
       - name: Typecheck
-        run: yarn typecheck
+        run: npm run typecheck
 
       - name: Build app
         run: ${{ matrix.build_cmd }}
