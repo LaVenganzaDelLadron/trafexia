@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useLicenseStore } from '@/stores/licenseStore';
-import { X, Coffee, Crown, Heart, ArrowRight, Mail, ExternalLink } from 'lucide-vue-next';
+import { X, Coffee, Heart } from 'lucide-vue-next';
 
 const licenseStore = useLicenseStore();
 
