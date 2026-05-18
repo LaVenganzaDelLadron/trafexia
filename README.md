@@ -178,6 +178,15 @@ Get the latest release for your platform:
 | 🪟 Windows | [Download](https://github.com/danieldev23/trafexia/releases/latest) | `Trafexia-Setup-x.x.x.exe` |
 | 🐧 Linux | [Download](https://github.com/danieldev23/trafexia/releases/latest) | `Trafexia-x.x.x.AppImage` |
 
+> [!TIP]
+> **🍎 macOS "App is damaged" Warning Fix:**
+> Since this is a free, unsigned package, Google Chrome/macOS Gatekeeper will automatically quarantine it and show the error: *"Trafexia is damaged and can't be opened."*
+> To fix this instantly, open your Terminal on macOS and run:
+> ```bash
+> xattr -cr /Applications/Trafexia.app
+> ```
+> *(Make sure you have dragged the Trafexia app into your `/Applications` directory first).*
+
 ---
 
 ## 📖 Usage Guide
