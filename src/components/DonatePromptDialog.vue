@@ -10,11 +10,11 @@ const vietPaymentMethod = ref<'momo' | 'bank'>('momo');
 
 // VIETNAMESE DONATION CONFIG
 const DONG_DONATE_CONFIG = {
-  momoPhone: '092942026',        // Your MoMo phone number (nhantien.momo.vn)
+  momoPhone: '0357658852',        // Your MoMo phone number (nhantien.momo.vn)
   bankId: 'MB',                 // Bank ID (e.g. VCB for Vietcombank, TCB, MB, ACB...)
-  accountNumber: '992942026',    // Your bank account number
+  accountNumber: '09999838622222',    // Your bank account number
   accountName: 'DANG QUOC HUY',   // Your full name (no accent, uppercase)
-  amountVnd: 50000               // Small donation amount for coffee e.g. 50k VND (~$2)
+  amountVnd: 100000               // Small donation amount for coffee e.g. 50k VND (~$2)
 };
 
 const vietQrUrl = computed(() => {
@@ -116,12 +116,14 @@ function disablePermanently() {
 
                 <div class="transfer-details">
                   <div v-if="vietPaymentMethod === 'momo'">
-                    <p class="instr">Quét mã MoMo để mời tác giả ly cafe **50.000đ**.</p>
+                    <p class="instr">Quét mã MoMo để mời tác giả ly cafe <b style="color: orange">{{
+                      (DONG_DONATE_CONFIG.amountVnd).toLocaleString('vi-VN') }} VNĐ</b></p>
                     <p class="note">Nội dung chuyển khoản (Lời nhắn): <br><strong class="highlight">TRAFEXIA COFFEE
                         DONATION</strong></p>
                   </div>
                   <div v-else>
-                    <p class="instr">Quét mã ngân hàng (Vietcombank) để mời tác giả ly cafe **50.000đ**.</p>
+                    <p class="instr">Quét mã ngân hàng (Vietcombank) để mời tác giả ly cafe <b style="color: orange;">{{
+                      (DONG_DONATE_CONFIG.amountVnd).toLocaleString('vi-VN') }} VNĐ</b></p>
                     <p class="note">Nội dung chuyển khoản đã được điền sẵn: <br><strong class="highlight">TRAFEXIA
                         COFFEE DONATION</strong></p>
                   </div>
